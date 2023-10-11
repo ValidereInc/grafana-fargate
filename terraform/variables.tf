@@ -122,3 +122,9 @@ variable "cloudflare_record_tags" {
   description = "Tags for cloudflare DNS record"
   type        = list(string)
 }
+
+variable "do_backup" {
+  description = "controls whether RDS isntance is backed up through AWS backup via backup-plan tag"
+  type        = bool
+  default     = true
+}

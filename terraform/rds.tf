@@ -69,7 +69,7 @@ resource "aws_rds_cluster" "grafana" {
   skip_final_snapshot    = true
   kms_key_id             = aws_kms_key.this.key_id
 
-  tags = var.common_tags
+  tags = var.do_backup ? merge(var.common_tags, {"backup-plan": var.common_tags.environment}) : var.common_tags
 
   lifecycle {
     create_before_destroy = true
