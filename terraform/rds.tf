@@ -52,7 +52,7 @@ resource "aws_kms_key" "this" {
 
 resource "aws_kms_alias" "a" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
-  name          = "alias/${var.common_tags.env}-${var.common_tags.service}-s3-kms-key"
+  name          = "alias/${var.common_tags.environment}-${var.common_tags.service}-s3-kms-key"
   target_key_id = aws_kms_key.this.key_id
 }
 
