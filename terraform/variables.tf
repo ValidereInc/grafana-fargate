@@ -1,7 +1,7 @@
 variable "common_tags" {
   type = object({
     service     = string
-    env         = string
+    environment = string
     managed-via = string
   })
 }
