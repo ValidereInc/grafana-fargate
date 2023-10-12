@@ -43,7 +43,7 @@ resource "aws_secretsmanager_secret_version" "creds" {
 
 resource "aws_kms_key" "this" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key
-  description         = "Key used to encrypt data in virtual analyzer monitoring database"
+  description         = "Key used to encrypt data in grafana database"
   enable_key_rotation = true
   multi_region = true
 
@@ -52,7 +52,7 @@ resource "aws_kms_key" "this" {
 
 resource "aws_kms_alias" "a" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
-  name          = "alias/${var.common_tags.environment}-${var.common_tags.service}-s3-kms-key"
+  name          = "alias/${var.common_tags.environment}-${var.common_tags.service}-grafana-kms-key"
   target_key_id = aws_kms_key.this.key_id
 }
 
