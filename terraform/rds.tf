@@ -82,8 +82,7 @@ resource "aws_rds_cluster_instance" "grafana" {
   count = "1"
 
   cluster_identifier         = aws_rds_cluster.grafana.id
-  identifier_prefix          = timestamp()
-  identifier                 = "${var.resource_prefix}-grafana-${count.index}"
+  identifier_prefix          = "${var.resource_prefix}-grafana-${count.index}"
   engine                     = "aurora-mysql"
   engine_version             = "5.7.mysql_aurora.2.11.2"
   instance_class             = var.db_instance_type
