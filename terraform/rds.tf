@@ -67,6 +67,7 @@ resource "aws_rds_cluster" "grafana" {
   db_subnet_group_name   = aws_db_subnet_group.grafana.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   skip_final_snapshot    = true
+  kms_key_id             = aws_kms_key.this.arn
 
   tags = var.do_backup ? merge(var.common_tags, {"backup-plan": var.common_tags.environment}) : var.common_tags
 
