@@ -126,5 +126,5 @@ variable "cloudflare_record_tags" {
 variable "do_backup" {
   description = "controls whether RDS isntance is backed up through AWS backup via backup-plan tag"
   type        = bool
-  default     = true
+  default     = false
 }
