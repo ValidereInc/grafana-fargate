@@ -1,6 +1,6 @@
 // lb dns
 output "grafana_rds" {
-  value = aws_rds_cluster.grafana_encrypted.endpoint
+  value = aws_rds_cluster.grafana.endpoint
 }
 
 output "grafana_role" {
