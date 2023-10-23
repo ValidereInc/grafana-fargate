@@ -1,3 +1,11 @@
+variable "common_tags" {
+  type = object({
+    service     = string
+    environment = string
+    managed-via = string
+  })
+}
+
 variable "region" {
   default     = "us-east-1"
   description = "The primary AWS region"
@@ -115,3 +123,8 @@ variable "cloudflare_record_tags" {
   type        = list(string)
 }
 
+variable "do_backup" {
+  description = "controls whether RDS isntance is backed up through AWS backup via backup-plan tag"
+  type        = bool
+  default     = true
+}

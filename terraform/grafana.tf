@@ -4,7 +4,7 @@ locals {
     GF_SERVER_ROOT_URL   = "https://${var.grafana_subdomain}.${var.dns_name}"
     GF_DATABASE_USER     = var.grafana_db_username
     GF_DATABASE_TYPE     = "mysql"
-    GF_DATABASE_HOST     = "${aws_rds_cluster.grafana.endpoint}:3306"
+    GF_DATABASE_HOST     = "${aws_rds_cluster.grafana_encrypted.endpoint}:3306"
     GF_LOG_LEVEL         = var.grafana_log_level
     GF_DATABASE_PASSWORD = random_password.password.result
     ### AUTH
@@ -23,14 +23,19 @@ locals {
   }
 }
 resource "aws_ecs_cluster" "grafana" {
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster
   name = "${var.resource_prefix}-grafana-cluster"
+  tags = var.common_tags
 }
 
 resource "aws_ecr_repository" "grafana" {
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_repository
   name = "${var.resource_prefix}-grafana"
+  tags = var.common_tags
 }
 
 resource "aws_ecs_task_definition" "grafana" {
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition
   family = "${var.resource_prefix}-grafana_task_definition"
   container_definitions = jsonencode([
     {
@@ -71,9 +76,12 @@ resource "aws_ecs_task_definition" "grafana" {
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = var.common_tags
 }
 
 resource "aws_ecs_service" "grafana" {
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_service
   name            = "${var.resource_prefix}-grafana"
   cluster         = aws_ecs_cluster.grafana.name
   task_definition = aws_ecs_task_definition.grafana.arn
@@ -100,8 +108,12 @@ resource "aws_ecs_service" "grafana" {
   lifecycle {
     ignore_changes = [desired_count]
   }
+
+  tags = var.common_tags
 }
 
 resource "aws_cloudwatch_log_group" "grafana" {
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group
   name = "${var.resource_prefix}-grafana"
+  tags = var.common_tags
 }
