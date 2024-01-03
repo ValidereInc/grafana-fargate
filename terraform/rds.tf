@@ -55,7 +55,7 @@ resource "aws_kms_alias" "a" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
   count         = var.is_backup ? 0 : 1
   name          = "alias/${var.common_tags.environment}-${var.common_tags.service}-grafana-kms-key"
-  target_key_id = aws_kms_key.this.key_id
+  target_key_id = aws_kms_key.this[0].key_id
 }
 
 resource "aws_kms_replica_key" "replica" {
