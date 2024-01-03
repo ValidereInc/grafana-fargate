@@ -56,46 +56,6 @@ resource "aws_kms_alias" "a" {
   target_key_id = aws_kms_key.this.key_id
 }
 
-resource "aws_rds_cluster" "grafana" {
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster
-  database_name          = "grafana"
-  engine                 = "aurora-mysql"
-  engine_version         = "5.7.mysql_aurora.2.11.2"
-  master_username        = var.grafana_db_username
-  master_password        = random_password.password.result
-  storage_encrypted      = true
-  db_subnet_group_name   = aws_db_subnet_group.grafana.name
-  vpc_security_group_ids = [aws_security_group.rds.id]
-  skip_final_snapshot    = true
-
-  tags = var.do_backup ? merge(var.common_tags, { "backup-plan" : var.common_tags.environment }) : var.common_tags
-
-  lifecycle {
-    create_before_destroy = true
-    prevent_destroy       = false
-  }
-}
-
-resource "aws_rds_cluster_instance" "grafana" {
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster_instance
-  count = "1"
-
-  cluster_identifier         = aws_rds_cluster.grafana.id
-  identifier                 = "${var.resource_prefix}-grafana-${count.index}"
-  engine                     = "aurora-mysql"
-  engine_version             = "5.7.mysql_aurora.2.11.2"
-  instance_class             = var.db_instance_type
-  publicly_accessible        = false
-  db_subnet_group_name       = aws_db_subnet_group.grafana.name
-  auto_minor_version_upgrade = true
-
-  tags = var.common_tags
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_rds_cluster" "grafana_encrypted" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster
   database_name           = "grafana"
