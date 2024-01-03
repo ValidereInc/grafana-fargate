@@ -84,6 +84,7 @@ data "aws_kms_key" "replica" {
 
 resource "aws_rds_cluster" "grafana_encrypted" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster
+  cluster_identifier      = "${var.common_tags.environment}-grafana-monitoring-db-cluster"
   database_name           = "grafana"
   engine                  = "aurora-mysql"
   engine_version          = "5.7.mysql_aurora.2.11.2"
