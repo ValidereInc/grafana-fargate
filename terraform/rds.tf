@@ -43,6 +43,7 @@ resource "aws_secretsmanager_secret_version" "creds" {
 
 resource "aws_kms_key" "this" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_key
+  count               = var.is_backup ? 0 : 1
   description         = "Key used to encrypt data in grafana database"
   enable_key_rotation = true
   multi_region        = true
@@ -52,8 +53,33 @@ resource "aws_kms_key" "this" {
 
 resource "aws_kms_alias" "a" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
+  count         = var.is_backup ? 0 : 1
   name          = "alias/${var.common_tags.environment}-${var.common_tags.service}-grafana-kms-key"
   target_key_id = aws_kms_key.this.key_id
+}
+
+resource "aws_kms_replica_key" "replica" {
+  # https://registry.terraform.io/providers/hashicorp/awscc/latest/docs/resources/kms_replica_key
+  provider        = aws.dr
+  count           = var.do_backup && !var.is_backup ? 1 : 0
+  primary_key_arn = aws_kms_key.this[0].arn
+
+  tags = var.common_tags
+}
+
+resource "aws_kms_alias" "replica_alias" {
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
+  provider      = aws.dr
+  count         = var.do_backup && !var.is_backup ? 1 : 0
+  name          = "alias/${var.common_tags.environment}-${var.common_tags.service}-grafana-kms-key"
+  target_key_id = aws_kms_replica_key.replica[0].key_id
+}
+
+data "aws_kms_key" "replica" {
+  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/kms_key
+  # if deploying backup, use existing multi-region kms key (must have already been deployed)
+  count  = var.is_backup ? 1 : 0
+  key_id = "alias/${var.common_tags.environment}-${var.common_tags.service}-grafana-kms-key"
 }
 
 resource "aws_rds_cluster" "grafana_encrypted" {
@@ -67,7 +93,7 @@ resource "aws_rds_cluster" "grafana_encrypted" {
   db_subnet_group_name    = aws_db_subnet_group.grafana.name
   vpc_security_group_ids  = [aws_security_group.rds.id]
   skip_final_snapshot     = true
-  kms_key_id              = aws_kms_key.this.arn
+  kms_key_id              = var.is_backup ? data.aws_kms_key.replica[0].arn : aws_kms_key.this[0].arn
   backup_retention_period = 5
 
   tags = var.do_backup ? merge(var.common_tags, { "backup-plan" : var.common_tags.environment }) : var.common_tags

@@ -128,3 +128,15 @@ variable "do_backup" {
   type        = bool
   default     = true
 }
+
+variable "dr_region" {
+  description = "region to which to replicate kms key"
+  type        = string
+  default     = "us-east-2"
+}
+
+variable "is_backup" {
+  description = "specifies if the deployment is a disaster recovery backup. Controls creation of certain resources like KMS keys."
+  type        = bool
+  default     = false
+}
