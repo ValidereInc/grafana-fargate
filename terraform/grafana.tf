@@ -4,9 +4,9 @@ locals {
     GF_SERVER_ROOT_URL   = "https://${var.grafana_subdomain}.${var.dns_name}"
     GF_DATABASE_USER     = var.grafana_db_username
     GF_DATABASE_TYPE     = "mysql"
-    GF_DATABASE_HOST     = "${aws_rds_cluster.grafana_encrypted.endpoint}:3306"
+    GF_DATABASE_HOST     = var.is_backup ? "${data.aws_rds_cluster.restored[0].endpoint}:3306" : "${aws_rds_cluster.grafana_encrypted[0].endpoint}:3306"
     GF_LOG_LEVEL         = var.grafana_log_level
-    GF_DATABASE_PASSWORD = random_password.password.result
+    GF_DATABASE_PASSWORD = var.is_backup ? data.aws_secretsmanager_secret_version.creds[0].secret_string : random_password.password[0].result
     ### AUTH
     GF_AUTH_GENERIC_OAUTH_ENABLED               = "True"
     GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP         = "True"

@@ -140,3 +140,9 @@ variable "is_backup" {
   type        = bool
   default     = false
 }
+
+variable "create_database" {
+  description = "specifies if the database should be created"
+  type        = bool
+  default     = true
+}

@@ -27,18 +27,29 @@ resource "aws_db_subnet_group" "grafana" {
 }
 
 resource "random_password" "password" {
+  count = var.is_backup ? 0 : 1
   length  = 16
   special = false
 }
 
 resource "aws_secretsmanager_secret" "creds" {
-  name        = "${var.resource_prefix}-grafana-backend-db"
+  count = var.do_backup && !var.is_backup ? 1 : 0
+  name        = "${var.common_tags.environment}-${var.common_tags.service}-grafana-backend-db-password"
   description = "Credential for Grafana MySQL backend"
+  replica {
+    region = var.dr_region
+  }
 }
 
 resource "aws_secretsmanager_secret_version" "creds" {
-  secret_id     = aws_secretsmanager_secret.creds.id
-  secret_string = random_password.password.result
+  count = var.do_backup && !var.is_backup ? 1 : 0
+  secret_id     = aws_secretsmanager_secret.creds[0].id
+  secret_string = random_password.password[0].result
+}
+
+data "aws_secretsmanager_secret_version" "creds" {
+  count = var.is_backup ? 1 : 0
+  secret_id =  "${var.common_tags.environment}-${var.common_tags.service}-grafana-backend-db-password"
 }
 
 resource "aws_kms_key" "this" {
@@ -75,27 +86,23 @@ resource "aws_kms_alias" "replica_alias" {
   target_key_id = aws_kms_replica_key.replica[0].key_id
 }
 
-data "aws_kms_key" "replica" {
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/kms_key
-  # if deploying backup, use existing multi-region kms key (must have already been deployed)
-  count  = var.is_backup ? 1 : 0
-  key_id = "alias/${var.common_tags.environment}-${var.common_tags.service}-grafana-kms-key"
-}
-
 resource "aws_rds_cluster" "grafana_encrypted" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster
+  # if this is the backup, we don't provision the cluster because it will be done via the restore job (click-ops)
+  count = var.is_backup ? 0 : 1
+
   cluster_identifier      = "${var.common_tags.environment}-grafana-monitoring-db-cluster"
   database_name           = "grafana"
   engine                  = "aurora-mysql"
   engine_version          = "5.7.mysql_aurora.2.11.2"
   master_username         = var.grafana_db_username
-  master_password         = random_password.password.result
+  master_password         = var.is_backup ? data.aws_secretsmanager_secret_version.creds[0].secret_string : random_password.password[0].result
   storage_encrypted       = true
   db_subnet_group_name    = aws_db_subnet_group.grafana.name
   vpc_security_group_ids  = [aws_security_group.rds.id]
   skip_final_snapshot     = true
-  kms_key_id              = var.is_backup ? data.aws_kms_key.replica[0].arn : aws_kms_key.this[0].arn
-  backup_retention_period = 5
+  kms_key_id              = aws_kms_key.this[0].arn
+  backup_retention_period = 2
 
   tags = var.do_backup ? merge(var.common_tags, { "backup-plan" : var.common_tags.environment }) : var.common_tags
 
@@ -105,10 +112,15 @@ resource "aws_rds_cluster" "grafana_encrypted" {
   }
 }
 
+data "aws_rds_cluster" "restored" {
+  # if this is the backup, we read in the restored cluster
+  count = var.is_backup ? 1 : 0
+  cluster_identifier = "${var.common_tags.environment}-grafana-monitoring-db-cluster"
+}
+
 resource "aws_rds_cluster_instance" "grafana_encrypted" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster_instance
-
-  cluster_identifier         = aws_rds_cluster.grafana_encrypted.id
+  cluster_identifier         = var.is_backup ? data.aws_rds_cluster.restored[0].cluster_identifier : aws_rds_cluster.grafana_encrypted[0].cluster_identifier
   identifier                 = "${var.common_tags.environment}-grafana-monitoring-db"
   engine                     = "aurora-mysql"
   engine_version             = "5.7.mysql_aurora.2.11.2"
