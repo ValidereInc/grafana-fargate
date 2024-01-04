@@ -117,7 +117,7 @@ resource "aws_rds_cluster_instance" "grafana_encrypted" {
   db_subnet_group_name       = aws_db_subnet_group.grafana.name
   auto_minor_version_upgrade = true
 
-  tags = var.common_tags
+  tags = var.do_backup ? merge(var.common_tags, { "backup-plan" : var.common_tags.environment }) : var.common_tags
 
   lifecycle {
     create_before_destroy = true
