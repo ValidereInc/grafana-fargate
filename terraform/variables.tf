@@ -6,6 +6,11 @@ variable "common_tags" {
   })
 }
 
+variable "environment" {
+  description = "The (abbreviated name) of the environment to deploy to"
+  default     = "dev"
+}
+
 variable "region" {
   default     = "us-east-1"
   description = "The primary AWS region"
@@ -26,6 +31,10 @@ variable "grafana_alb_security_group_id" {
 
 variable "grafana_ecs_security_group_id" {
   description = "id of the security group for the Grafana ecs"
+}
+
+variable "grafana_rds_security_group_id" {
+  description = "id of the security group for the Grafana rds cluster"
 }
 
 variable "dns_name" {
