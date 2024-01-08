@@ -72,6 +72,7 @@ resource "aws_rds_cluster" "grafana_encrypted" {
   database_name           = "grafana"
   engine                  = "aurora-mysql"
   engine_version          = "5.7.mysql_aurora.2.11.2"
+  availability_zones      = var.availability_zones
   master_username         = var.grafana_db_username
   master_password         = var.is_backup ? data.aws_secretsmanager_secret_version.creds[0].secret_string : random_password.password[0].result
   storage_encrypted       = true
@@ -97,8 +98,10 @@ data "aws_rds_cluster" "restored" {
 
 resource "aws_rds_cluster_instance" "grafana_encrypted" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/rds_cluster_instance
+  for_each = toset(var.availability_zones)
+
   cluster_identifier         = var.is_backup ? data.aws_rds_cluster.restored[0].cluster_identifier : aws_rds_cluster.grafana_encrypted[0].cluster_identifier
-  identifier                 = "${var.common_tags.environment}-grafana-monitoring-db"
+  identifier                 = "${var.common_tags.environment}-grafana-monitoring-db-${each.key}"
   engine                     = "aurora-mysql"
   engine_version             = "5.7.mysql_aurora.2.11.2"
   instance_class             = var.db_instance_type

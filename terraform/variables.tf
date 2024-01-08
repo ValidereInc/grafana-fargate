@@ -149,3 +149,9 @@ variable "is_backup" {
   type        = bool
   default     = false
 }
+
+variable "availability_zones" {
+  description = "availability zones to use for the RDS cluster instances"
+  type        = list(string)
+  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
+}
