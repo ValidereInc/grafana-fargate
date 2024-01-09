@@ -6,6 +6,11 @@ variable "common_tags" {
   })
 }
 
+variable "environment" {
+  description = "The (abbreviated name) of the environment to deploy to"
+  default     = "dev"
+}
+
 variable "region" {
   default     = "us-east-1"
   description = "The primary AWS region"
@@ -26,6 +31,10 @@ variable "grafana_alb_security_group_id" {
 
 variable "grafana_ecs_security_group_id" {
   description = "id of the security group for the Grafana ecs"
+}
+
+variable "grafana_rds_security_group_id" {
+  description = "id of the security group for the Grafana rds cluster"
 }
 
 variable "dns_name" {
@@ -127,4 +136,22 @@ variable "do_backup" {
   description = "controls whether RDS isntance is backed up through AWS backup via backup-plan tag"
   type        = bool
   default     = true
+}
+
+variable "dr_region" {
+  description = "region to which to replicate kms key"
+  type        = string
+  default     = "us-east-2"
+}
+
+variable "is_backup" {
+  description = "specifies if the deployment is a disaster recovery backup. Controls creation of certain resources like KMS keys."
+  type        = bool
+  default     = false
+}
+
+variable "availability_zones" {
+  description = "availability zones to use for the RDS cluster instances"
+  type        = list(string)
+  default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
 }
