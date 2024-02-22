@@ -80,7 +80,7 @@ resource "aws_rds_cluster" "grafana_encrypted" {
   vpc_security_group_ids  = [var.grafana_rds_security_group_id]
   skip_final_snapshot     = true
   kms_key_id              = aws_kms_key.this[0].arn
-  backup_retention_period = 5
+  backup_retention_period = var.db_backup_retention_period
 
   tags = var.do_backup ? merge(var.common_tags, { "backup-plan" : var.common_tags.environment }) : var.common_tags
 

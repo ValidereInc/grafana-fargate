@@ -77,6 +77,12 @@ variable "db_instance_type" {
   default     = "db.t2.small"
 }
 
+variable "db_backup_retention_period" {
+  description = "value in days for the backup retention period"
+  default = 5
+  
+}
+
 variable "image_url" {
   description = "the image url for the grafana image"
   default     = "grafana/grafana:8.2.6"
