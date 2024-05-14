@@ -87,6 +87,9 @@ resource "aws_rds_cluster" "grafana_encrypted" {
   lifecycle {
     create_before_destroy = true
     prevent_destroy       = false
+    ignore_changes = [
+      engine_version,
+    ]
   }
 }
 
@@ -113,5 +116,8 @@ resource "aws_rds_cluster_instance" "grafana_encrypted" {
 
   lifecycle {
     create_before_destroy = true
+    ignore_changes = [
+      engine_version,
+    ]
   }
 }
