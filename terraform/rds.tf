@@ -71,7 +71,7 @@ resource "aws_rds_cluster" "grafana_encrypted" {
   cluster_identifier      = "${var.common_tags.environment}-grafana-monitoring-db-cluster"
   database_name           = "grafana"
   engine                  = "aurora-mysql"
-  engine_version          = "5.7.mysql_aurora.2.11.2"
+  engine_version          = "5.7.mysql_aurora.2.11.5"
   availability_zones      = var.availability_zones
   master_username         = var.grafana_db_username
   master_password         = var.is_backup ? data.aws_secretsmanager_secret_version.creds[0].secret_string : random_password.password[0].result
