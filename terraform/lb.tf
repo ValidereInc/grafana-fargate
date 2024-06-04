@@ -16,14 +16,6 @@ resource "aws_kms_key" "aws_lb_logs" {
         Principal = {
           AWS = "arn:aws:iam::${var.account_id}:root"
         }
-        Action   = "kms:*"
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "s3.amazonaws.com"
-        }
         Action = [
           "kms:Create*",
           "kms:Describe*",
@@ -38,11 +30,30 @@ resource "aws_kms_key" "aws_lb_logs" {
           "kms:ScheduleKeyDeletion",
           "kms:CancelKeyDeletion",
           "kms:ReplicateKey",
-          "kms:Decrypt",
-          "kms:Encrypt",
-          "kms:ReEncrypt",
+          "kms:Decrypt*",
+          "kms:Encrypt*",
+          "kms:ReEncrypt*",
           "kms:GenerateDataKey*",
           "kms:TagResource",
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "s3.amazonaws.com"
+        }
+        Action = [
+          "kms:Create*",
+          "kms:Decrypt*",
+          "kms:Describe*",
+          "kms:Encrypt*",
+          "kms:Get*",
+          "kms:List*",
+          "kms:ReEncrypt*",
+          "kms:Sign",
+          "kms:Verify*",
+          "kms:GenerateDataKey*",
         ]
         Resource = "*"
       }
