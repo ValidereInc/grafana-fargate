@@ -28,12 +28,6 @@ resource "aws_ecs_cluster" "grafana" {
   tags = var.common_tags
 }
 
-resource "aws_ecr_repository" "grafana" {
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecr_repository
-  name = "${var.resource_prefix}-grafana"
-  tags = var.common_tags
-}
-
 resource "aws_ecs_task_definition" "grafana" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_task_definition
   family = "${var.resource_prefix}-grafana_task_definition"
