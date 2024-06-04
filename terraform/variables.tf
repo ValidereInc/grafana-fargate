@@ -79,8 +79,8 @@ variable "db_instance_type" {
 
 variable "db_backup_retention_period" {
   description = "value in days for the backup retention period"
-  default = 5
-  
+  default     = 5
+
 }
 
 variable "image_url" {
