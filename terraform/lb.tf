@@ -66,7 +66,7 @@ resource "aws_kms_key" "aws_lb_logs" {
 resource "aws_kms_alias" "aws_lb_logs" {
   # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kms_alias
   name          = "alias/${var.common_tags.environment}-grafana-alb-access-logs-s3-bucket-key"
-  target_key_id = aws_kms_key.aws_alb_access_logs_bucket.id
+  target_key_id = aws_kms_key.aws_lb_logs.id
 }
 
 resource "aws_s3_bucket" "aws_lb_logs" {
@@ -84,7 +84,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "aws_lb_logs" {
   rule {
     bucket_key_enabled = true
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.aws_alb_access_logs_bucket.arn
+      kms_master_key_id = aws_kms_key.aws_lb_logs.arn
       sse_algorithm     = "aws:kms"
     }
   }
