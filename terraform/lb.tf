@@ -38,9 +38,9 @@ resource "aws_kms_key" "aws_lb_logs" {
           "kms:ScheduleKeyDeletion",
           "kms:CancelKeyDeletion",
           "kms:ReplicateKey",
-          "kms:Decrypt*",
-          "kms:Encrypt*",
-          "kms:ReEncrypt*",
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:ReEncrypt",
           "kms:GenerateDataKey*",
           "kms:TagResource",
         ]
