@@ -128,7 +128,7 @@ resource "aws_lb" "grafana" {
 
   access_logs {
     bucket  = aws_s3_bucket.aws_lb_logs.id
-    prefix  = "${local.access_logs_bucket_name}/"
+    prefix  = "${local.access_logs_bucket_name}"
     enabled = true
   }
 
