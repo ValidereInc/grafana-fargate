@@ -161,3 +161,8 @@ variable "availability_zones" {
   type        = list(string)
   default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
 }
+
+variable "alb_access_logs_bucket_name" {
+  description = "bucket in which to store alb access logs"
+  type        = string
+}
