@@ -8,24 +8,12 @@ resource "aws_lb" "grafana" {
 
   enable_deletion_protection = false
 
-  tags = var.common_tags
-}
-
-resource "aws_lb_listener" "front_end_http" {
-  # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb_listener
-  load_balancer_arn = aws_lb.grafana.arn
-  port              = "80"
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
+  access_logs {
+    bucket  = var.alb_access_logs_bucket_name
+    prefix  = "grafana-alb"
+    enabled = true
   }
+
   tags = var.common_tags
 }
 
@@ -34,7 +22,7 @@ resource "aws_lb_listener" "front_end_https" {
   load_balancer_arn = aws_lb.grafana.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = var.cert_arn
 
   default_action {

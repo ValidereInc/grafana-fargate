@@ -79,8 +79,8 @@ variable "db_instance_type" {
 
 variable "db_backup_retention_period" {
   description = "value in days for the backup retention period"
-  default = 5
-  
+  default     = 5
+
 }
 
 variable "image_url" {
@@ -160,4 +160,9 @@ variable "availability_zones" {
   description = "availability zones to use for the RDS cluster instances"
   type        = list(string)
   default     = ["us-west-2a", "us-west-2b", "us-west-2c"]
+}
+
+variable "alb_access_logs_bucket_name" {
+  description = "bucket in which to store alb access logs"
+  type        = string
 }
