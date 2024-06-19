@@ -58,7 +58,6 @@ resource "aws_ecs_task_definition" "grafana" {
           value = lookup(local.grafana_config, key)
         }
       ]
-      readonlyRootFilesystem = true
     }
   ])
   requires_compatibilities = ["FARGATE"]
