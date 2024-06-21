@@ -7,6 +7,7 @@ resource "aws_lb" "grafana" {
   idle_timeout    = "3600"
 
   enable_deletion_protection = false
+  drop_invalid_header_fields = true
 
   access_logs {
     bucket  = var.alb_access_logs_bucket_name
