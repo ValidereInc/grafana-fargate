@@ -163,6 +163,7 @@ resource "aws_rds_cluster_instance" "grafana_encrypted" {
   publicly_accessible        = false
   db_subnet_group_name       = data.aws_db_subnet_group.grafana.name
   auto_minor_version_upgrade = true
+  ca_cert_identifier         = "rds-ca-rsa2048-g1"
 
   tags = var.do_backup ? merge(var.common_tags, { "backup-plan" : var.common_tags.environment }) : var.common_tags
 
